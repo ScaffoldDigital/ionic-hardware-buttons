@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { App, NavController, Platform } from 'ionic-angular';
+import { App, NavController, Platform, IonicApp } from 'ionic-angular';
 
 let callbacks = {};
 
@@ -19,7 +19,8 @@ export function BackButton() {
 export class HardwareButtons {
     constructor(
         private app: App,
-        private platform: Platform
+        private platform: Platform,
+        private ionicApp: IonicApp
     ) {
 
     }
@@ -28,6 +29,17 @@ export class HardwareButtons {
         let platform = this.platform;
 
         platform.registerBackButtonAction(() => {
+            let activePortal = this.ionicApp._loadingPortal.getActive() ||
+                this.ionicApp._modalPortal.getActive() ||
+                this.ionicApp._toastPortal.getActive() ||
+                this.ionicApp._overlayPortal.getActive();
+     
+            //activePortal is the active overlay like a modal,toast,etc
+            if (activePortal) {
+                activePortal.dismiss();
+                return
+            }            
+
             let activeNav: NavController = this.app.getActiveNav();
             let navCtrl = activeNav;
 
